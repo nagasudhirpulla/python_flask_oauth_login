@@ -42,7 +42,7 @@ def unauthorized():
 @login_manager.user_loader
 def load_user(user_id):
     sUser = session['SUSER']
-    return User(sUser['id'], sUser['name'], sUser['email'])
+    return User(sUser['id'], sUser['name'], sUser['email'], sUser['roles'])
 
 
 @oauthPage.route("/login")
@@ -104,21 +104,25 @@ def callback():
     # We want to make sure their email is verified.
     # The user authenticated with Google, authorized our
     # app, and now we've verified their email through Google!
+    userInfo = userinfo_response.json()
     if userinfo_response.json().get("email_verified"):
-        unique_id = userinfo_response.json()["sub"]
-        users_email = userinfo_response.json()["email"]
-        users_name = userinfo_response.json()["preferred_username"]
+        unique_id = userInfo["sub"]
+        users_email = userInfo["email"]
+        users_name = userInfo["preferred_username"]
+        uRoles = userInfo["role"]
+        if not(isinstance(uRoles, list)):
+            uRoles = [uRoles]
     else:
         return "User email not available or not verified by Google.", 400
 
     # Create a user in our db with the information provided
     # by Google
     user = User(
-        id_=unique_id, name=users_name, email=users_email
+        id_=unique_id, name=users_name, email=users_email, roles=uRoles
     )
 
     session['SUSER'] = {'id': unique_id,
-                        'email': users_email, 'name': users_name}
+                        'email': users_email, 'name': users_name, 'roles': uRoles}
     # Begin user session by logging the user in
     login_user(user)
     # Send user back to homepage

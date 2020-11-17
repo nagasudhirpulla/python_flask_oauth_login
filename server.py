@@ -1,6 +1,6 @@
 import json
 import os
-from flask import Flask, redirect, request, url_for, session
+from flask import Flask, redirect, request, url_for, session, render_template
 from flask_login import LoginManager, current_user
 from user import User
 from routeControllers.oauth import oauthPage, login_manager
@@ -19,15 +19,7 @@ app.register_blueprint(oauthPage, url_prefix='/oauth')
 
 @app.route("/")
 def index():
-    if current_user.is_authenticated:
-        return (
-            "<p>Hello, {}! You're logged in! Email: {}</p>"
-            '<a class="button" href="/oauth/logout">Logout</a>'.format(
-                current_user.name, current_user.email
-            )
-        )
-    else:
-        return '<a class="button" href="/oauth/login">Login</a>'
+    return render_template("index.html.j2")
 
 
 if __name__ == "__main__":
