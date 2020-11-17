@@ -2,7 +2,6 @@ import json
 import os
 from flask import Flask, redirect, request, url_for, session, render_template
 from flask_login import LoginManager, current_user
-from user import User
 from routeControllers.oauth import oauthPage, login_manager
 
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
