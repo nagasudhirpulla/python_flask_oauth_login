@@ -1,0 +1,5 @@
+{
+    "oauth_app_client_id": "",
+    "oauth_app_client_secret": "",
+    "oauth_provider_discovery_url": "https://google.in/id_provider/.well-known/openid-configuration"
+}
