@@ -4,12 +4,15 @@ import json
 from oauthlib.oauth2 import WebApplicationClient
 from user import User
 from flask_login import (
+    LoginManager,
     login_user,
     logout_user,
-    login_required
+    login_required,
 )
 
 from config import getConfig
+
+login_manager = LoginManager()
 
 oauthPage = Blueprint('oauth', __name__,
                       template_folder='templates')
@@ -22,13 +25,24 @@ oauth_provider_discovery_url = (
     appConfig["oauth_provider_discovery_url"]
 )
 
+# OAuth2 client setup
+client = WebApplicationClient(oauth_app_client_id)
+
 
 def get_oauth_provider_cfg():
     return requests.get(oauth_provider_discovery_url, verify=False).json()
 
 
-# OAuth2 client setup
-client = WebApplicationClient(oauth_app_client_id)
+@login_manager.unauthorized_handler
+def unauthorized():
+    return "You must be logged in to access this content.", 403
+
+
+# Flask-Login helper to retrieve a user from our db
+@login_manager.user_loader
+def load_user(user_id):
+    sUser = session['SUSER']
+    return User(sUser['id'], sUser['name'], sUser['email'])
 
 
 @oauthPage.route("/login")
