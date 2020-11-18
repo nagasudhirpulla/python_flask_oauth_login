@@ -3,7 +3,9 @@ import os
 from flask import Flask, redirect, request, url_for, session, render_template
 from flask_login import LoginManager, current_user
 from routeControllers.oauth import oauthPage, login_manager
+from config import getConfig
 
+appConfig = getConfig()
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 # Flask app setup
@@ -23,4 +25,4 @@ def index():
 
 if __name__ == "__main__":
     # app.run(ssl_context="adhoc", debug=True)
-    app.run(debug=True)
+    app.run(debug=True, port=appConfig['app_port'])

@@ -132,5 +132,19 @@ def callback():
 @oauthPage.route("/logout")
 @login_required
 def logout():
+    # logout from this application
     logout_user()
-    return redirect(url_for("index"))
+
+    # redirect to oauth provider for logout
+    # https://identityserver4.readthedocs.io/en/latest/endpoints/endsession.html
+    # https://connect2id.com/products/server/docs/api/logout
+    oauth_provider_cfg = get_oauth_provider_cfg()
+    if "id_token" in client.token:
+        endSessionEndpoint = oauth_provider_cfg["end_session_endpoint"]
+        idToken = client.token["id_token"]
+        redirectUrl = request.host_url
+        logoutUrl = "{0}?id_token_hint={1}&post_logout_redirect_uri={2}".format(
+            endSessionEndpoint, idToken, redirectUrl)
+        return redirect(logoutUrl)
+    else:
+        return redirect(url_for("index"))
